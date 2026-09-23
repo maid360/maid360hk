@@ -1,0 +1,108 @@
+# Apache configuration for Next.js static export
+# Place this file in the root of your Apache document root (usually public_html or www)
+
+# Enable Rewrite Engine
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Security Headers
+  <IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options "DENY"
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    # Referrer policy
+    Header always set Referrer-Policy "origin-when-cross-origin"
+  </IfModule>
+
+  # Handle Next.js static files
+  # If the requested file exists, serve it directly
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Service rewrites - Chinese characters
+  RewriteRule ^services/海外外傭$ /services/overseas [R=301,L]
+  RewriteRule ^services/本地外傭$ /services/local [R=301,L]
+  RewriteRule ^services/指定海外外傭$ /services/designated-overseas [R=301,L]
+  RewriteRule ^services/指定本地外傭$ /services/designated-local [R=301,L]
+  RewriteRule ^services/代辦續約外傭$ /services/renewal [R=301,L]
+  RewriteRule ^services/其他服務$ /services/other [R=301,L]
+
+  # Service rewrites - URL-encoded versions
+  RewriteRule ^services/%E6%B5%B7%E5%A4%96%E5%A4%96%E5%82%AD$ /services/overseas [R=301,L]
+  RewriteRule ^services/%E6%9C%AC%E5%9C%B0%E5%A4%96%E5%82%AD$ /services/local [R=301,L]
+  RewriteRule ^services/%E6%8C%87%E5%AE%9A%E6%B5%B7%E5%A4%96%E5%A4%96%E5%82%AD$ /services/designated-overseas [R=301,L]
+  RewriteRule ^services/%E6%8C%87%E5%AE%9A%E6%9C%AC%E5%9C%B0%E5%A4%96%E5%82%AD$ /services/designated-local [R=301,L]
+  RewriteRule ^services/%E4%BB%A3%E8%BE%A6%E7%BA%8C%E7%B4%84%E5%A4%96%E5%82%AD$ /services/renewal [R=301,L]
+  RewriteRule ^services/%E5%85%B6%E4%BB%96%E6%9C%8D%E5%8B%99$ /services/other [R=301,L]
+
+  # Employer guide
+  RewriteRule ^僱主須知$ /employer-guide [R=301,L]
+  RewriteRule ^%E5%83%B1%E4%B8%BB%E9%A0%88%E7%9F%A5$ /employer-guide [R=301,L]
+
+  # Premium services
+  RewriteRule ^星級服務$ /premium-services [R=301,L]
+  RewriteRule ^%E6%98%9F%E7%B4%9A%E6%9C%8D%E5%8B%99$ /premium-services [R=301,L]
+
+  # Search
+  RewriteRule ^搜尋外傭$ /search [R=301,L]
+  RewriteRule ^%E6%90%9C%E5%B0%8B%E5%A4%96%E5%82%AD$ /search [R=301,L]
+  RewriteRule ^搜尋外傭/(.+)$ /search/$1 [R=301,L]
+  RewriteRule ^%E6%90%9C%E5%B0%8B%E5%A4%96%E5%82%AD/(.+)$ /search/$1 [R=301,L]
+
+  # More workers
+  RewriteRule ^%E6%9B%B4%E5%A4%9A%E5%A4%96%E5%82%AD$ /search-iframe [R=301,L]
+
+  # Handle Next.js routing - serve index.html for client-side routes
+  # This ensures client-side routing works for pages not found
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Browser Caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/pdf "access plus 1 month"
+  ExpiresByType text/x-javascript "access plus 1 month"
+  ExpiresByType application/x-shockwave-flash "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# MIME Types - Enhanced configuration
+<IfModule mod_mime.c>
+  # Force correct MIME types for static assets
+  AddType text/css .css
+  AddType application/javascript .js
+  AddType image/webp .webp
+  AddType image/svg+xml .svg .svgz
+  AddType application/json .json
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType application/font-ttf .ttf
+  AddType image/png .png
+  AddType image/jpeg .jpg .jpeg
+  AddType image/gif .gif
+  AddType video/mp4 .mp4
+
+  # Explicit MIME type for Next.js CSS files
+  <FilesMatch "\.css$">
+    Header set Content-Type "text/css"
+  </FilesMatch>
+</IfModule>
+
